@@ -68,6 +68,9 @@ export function sessionCookieName(url: URL): string {
   return url.protocol === "https:" ? "__Host-pks_session" : "pks_session";
 }
 
+/**
+ * 有効期限と HMAC 署名が付与されたセッション Cookie 文字列を生成する。
+ */
 export async function createSessionCookie(token: string, url: URL, nowMs: number = Date.now()): Promise<string> {
   const expires = Math.floor(nowMs / 1000) + SESSION_TTL_SECONDS;
   const payload = `${SESSION_VERSION}.${expires}`;
@@ -80,6 +83,9 @@ export function clearSessionCookie(url: URL): string {
   return serializeCookie(sessionCookieName(url), "", url, 0);
 }
 
+/**
+ * セッション値の構造、有効期限、署名を検証する。
+ */
 async function verifySessionValue(value: string, token: string, nowMs: number): Promise<boolean> {
   const parts = value.split(".");
   if (parts.length !== 3 || parts[0] !== SESSION_VERSION || !/^\d{1,12}$/.test(parts[1])) return false;
