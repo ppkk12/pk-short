@@ -1,0 +1,46 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pk-short",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+
+  // https://pk-short.<アカウントのサブドメイン>.workers.dev で公開する。
+  // バージョンごとのプレビューURLは公開窓口が増えるだけなので無効にする。
+  "workers_dev": true,
+  "preview_urls": false,
+
+  // 管理画面（静的ファイル）。一致するファイルがないリクエスト（/pk など）は Worker が処理する。
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "none"
+  },
+
+  // 短縮URLの保存先（`wrangler d1 create pk-short --location apac` で作成）。
+  // database_id は秘密情報ではなく、ローカル開発（--local）では使われない。
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pk-short",
+      "database_id": "8d6ada6d-ad14-4883-823e-b6cfcfb92118",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // ADMIN_TOKEN は Secret として設定する（ソースコードや vars には書かない）。
+  // ローカル: .dev.vars / 本番: `npx wrangler secret put ADMIN_TOKEN`（値は対話入力でディスクに残さない）
+  // `secrets.required` は指定しない。指定すると初回デプロイに Secret ファイルが必須になるため。
+  // 未設定の間は Worker 側で管理操作をすべて拒否する（フェイルクローズ）。
+
+  // PUBLIC_CREATE_ENABLED を "false" にすると、ログインなしの作成を停止できる（悪用時の緊急停止用）。
+  // 上限は D1 の無料枠（書き込み 10 万行/日）に収まるように設定している。
+  "vars": {
+    "PUBLIC_CREATE_ENABLED": "true",
+    "PUBLIC_CREATE_LIMIT_PER_MINUTE": "10",
+    "PUBLIC_CREATE_LIMIT_PER_DAY": "100",
+    "CREATE_LIMIT_PER_DAY": "5000"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

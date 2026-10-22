@@ -1,0 +1,6 @@
+# ローカル開発用の環境変数（wrangler dev が読み込む）。
+# このファイルを .dev.vars にコピーして値を書き換えてください。.dev.vars は Git に含めないこと。
+#
+# トークンの生成例:
+#   node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"
+ADMIN_TOKEN=change-me-to-a-long-random-string

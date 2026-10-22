@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="PK Short は登録不要・無料の短縮URLサービスです。長いURLを貼り付けるだけで、すぐに短いURLを作れます。">
+  <title>PK Short — 登録不要の短縮URL</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へスキップ</a>
+
+  <header class="site-header">
+    <div class="wrap site-header-inner">
+      <a class="wordmark" href="/">
+        <span class="wordmark-mark" aria-hidden="true">PK</span>
+        <span class="wordmark-text">Short</span>
+      </a>
+      <div class="site-header-meta">
+        <span class="host" data-host title="現在のホスト"></span>
+        <span class="admin-badge" id="admin-badge" hidden>管理者</span>
+        <button type="button" class="button-text" id="admin-button" hidden>管理</button>
+        <button type="button" class="button-text" id="logout-button" hidden>ログアウト</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <section id="view-loading" class="view" aria-busy="true">
+      <p class="muted" id="loading-message">読み込み中…</p>
+      <button type="button" class="button-secondary" id="retry-button" hidden>再読み込み</button>
+    </section>
+
+    <section id="view-login" class="view view-narrow" aria-labelledby="login-title" hidden>
+      <h1 id="login-title">管理者ログイン</h1>
+      <p class="lede">管理者は、すべての短縮URLの一覧表示・削除と、1〜3文字の短い短縮キーの作成ができます。</p>
+
+      <div id="login-unconfigured" hidden>
+        <p class="notice">管理トークン（<code>ADMIN_TOKEN</code>）が設定されていないため、管理者ログインは無効です。短縮URLの作成は通常どおり利用できます。</p>
+        <dl class="setup-steps">
+          <div>
+            <dt>ローカル開発</dt>
+            <dd><code>.dev.vars</code> に <code>ADMIN_TOKEN=…</code> を書き、<code>npm run dev</code> を再起動</dd>
+          </div>
+          <div>
+            <dt>Cloudflare</dt>
+            <dd><code>npx wrangler secret put ADMIN_TOKEN</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="token-input">管理トークン</label>
+          <input id="token-input" name="token" type="password" autocomplete="current-password" spellcheck="false" required aria-describedby="token-error">
+          <p class="field-error" id="token-error" hidden></p>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="button-primary" id="login-button">ログイン</button>
+          <button type="button" class="button-text" id="login-back">短縮ページに戻る</button>
+        </div>
+      </form>
+      <p class="form-actions" id="login-back-only" hidden>
+        <button type="button" class="button-text" id="login-back-2">短縮ページに戻る</button>
+      </p>
+    </section>
+
+    <div id="view-app" class="view" hidden>
+      <section class="composer" aria-labelledby="composer-title">
+        <h1 id="composer-title">URLを短縮する</h1>
+        <p class="lede">登録不要・無料。長いURLを貼り付けて「短縮する」を押すだけで、すぐに使える短縮URLができます。</p>
+
+        <p class="notice" id="public-disabled" hidden>現在、ログインなしでの短縮URLの作成は一時停止しています。</p>
+
+        <form id="create-form" novalidate>
+          <div class="field">
+            <label for="url-input">元のURL</label>
+            <input id="url-input" class="input-large" name="url" type="url" inputmode="url"
+              autocomplete="off" autocapitalize="off" spellcheck="false" required
+              placeholder="https://example.com/products/category/item?id=12345"
+              aria-describedby="url-error">
+            <p class="field-error" id="url-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="slug-input">カスタムURL <span class="optional">任意</span></label>
+            <div class="affix">
+              <span class="affix-prefix" data-prefix aria-hidden="true"></span>
+              <input id="slug-input" name="slug" type="text" maxlength="40"
+                autocomplete="off" autocapitalize="off" spellcheck="false"
+                placeholder="my-link" aria-describedby="slug-hint slug-error">
+            </div>
+            <p class="field-hint" id="slug-hint"></p>
+            <p class="field-error" id="slug-error" hidden></p>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="button-primary" id="create-button">短縮する</button>
+            <button type="reset" class="button-text">入力をクリア</button>
+          </div>
+          <p class="form-error" id="create-error" role="alert" hidden></p>
+        </form>
+
+        <div class="result" id="result" tabindex="-1" aria-labelledby="result-title" hidden>
+          <p class="result-title" id="result-title">短縮URLを作成しました</p>
+          <div class="result-body">
+            <a class="result-url" id="result-url" target="_blank" rel="noopener noreferrer"></a>
+            <button type="button" class="button-secondary" id="result-copy">コピー</button>
+          </div>
+          <p class="result-destination">
+            <span class="result-destination-label">転送先</span>
+            <span id="result-destination"></span>
+          </p>
+        </div>
+      </section>
+
+      <section class="links" id="history-section" aria-labelledby="history-title">
+        <div class="links-heading">
+          <h2 id="history-title">このデバイスで作成した短縮URL</h2>
+          <p class="links-count" id="history-count" aria-live="polite"></p>
+        </div>
+        <ol class="link-list" id="history-list" aria-labelledby="history-title"></ol>
+        <div class="empty" id="history-empty" hidden>
+          <p class="empty-title">履歴はまだありません</p>
+          <p class="muted">短縮URLを作成すると、ここに表示されます。</p>
+        </div>
+        <p class="links-note">履歴はこのブラウザの中にだけ保存されます。履歴から消しても短縮URLは使えるままです。</p>
+      </section>
+
+      <section class="links" id="admin-section" aria-labelledby="links-title" hidden>
+        <div class="links-heading">
+          <h2 id="links-title">すべての短縮URL</h2>
+          <p class="links-count" id="links-count" aria-live="polite"></p>
+        </div>
+
+        <div class="links-status" id="links-status" hidden>
+          <p id="links-status-message"></p>
+          <button type="button" class="button-secondary" id="links-retry" hidden>再試行</button>
+        </div>
+
+        <ol class="link-list" id="link-list" aria-labelledby="links-title"></ol>
+
+        <div class="empty" id="links-empty" hidden>
+          <p class="empty-title">まだ短縮URLはありません</p>
+          <p class="muted">上のフォームに長いURLを入力して、最初の短縮URLを作成しましょう。</p>
+        </div>
+
+        <div class="load-more">
+          <button type="button" class="button-secondary" id="load-more" hidden>さらに表示</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer-inner">
+      <p>PK Short — 登録不要・無料の短縮URLサービス。短縮URLに有効期限はなく、転送時に広告は表示しません。</p>
+      <p>違法・有害なサイトや、他の短縮URLサービスへのリンクは登録できません。不適切なリンクは予告なく削除します。</p>
+      <p><a href="https://github.com/ppkk12/pk-short" rel="noopener noreferrer">ソースコード（GitHub）</a></p>
+    </div>
+  </footer>
+
+  <template id="link-row-template">
+    <li class="link-row">
+      <div class="link-main">
+        <a class="link-short" target="_blank" rel="noopener noreferrer"></a>
+        <div class="link-destination">
+          <a class="link-destination-url" target="_blank" rel="noopener noreferrer nofollow"></a>
+          <button type="button" class="button-text link-expand" aria-expanded="false" hidden>全文</button>
+        </div>
+      </div>
+      <dl class="link-meta">
+        <div>
+          <dt>作成</dt>
+          <dd><time class="link-created"></time></dd>
+        </div>
+        <div class="link-clicks-item">
+          <dt>クリック</dt>
+          <dd class="link-clicks"></dd>
+        </div>
+      </dl>
+      <div class="link-actions">
+        <button type="button" class="button-secondary link-copy">コピー</button>
+        <button type="button" class="button-secondary link-remove"></button>
+      </div>
+    </li>
+  </template>
+
+  <dialog class="dialog" id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+    <h2 id="delete-title">短縮URLを削除しますか？</h2>
+    <p id="delete-description">
+      <strong class="mono" id="delete-target"></strong> を削除すると、このURLにアクセスしても転送されなくなります。この操作は取り消せません。
+    </p>
+    <p class="form-error" id="delete-error" role="alert" hidden></p>
+    <div class="dialog-actions">
+      <button type="button" class="button-secondary" id="delete-cancel" autofocus>キャンセル</button>
+      <button type="button" class="button-danger" id="delete-confirm">削除する</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
