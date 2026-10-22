@@ -227,9 +227,7 @@ function applyMode() {
   }
 
   const min = admin ? 1 : PUBLIC_SLUG_MIN_LENGTH;
-  ui.slugHint.textContent =
-    `短縮URLの末尾を好きな文字列にできます。半角英数字・ハイフン・アンダースコアで${min}〜40文字` +
-    `（大文字と小文字は区別）。空欄なら推測されにくい文字列を自動で作ります。`;
+  ui.slugHint.textContent = `半角英数字と - _ で${min}〜40文字（大文字・小文字は区別）。空欄なら自動で決まります。`;
 
   if (admin) {
     void loadLinks({ reset: true });
@@ -760,7 +758,7 @@ async function copyFromButton(button, text) {
   }
   const original = button.dataset.label ?? button.textContent ?? "";
   button.dataset.label = original;
-  button.textContent = "コピー済み";
+  button.textContent = "コピーしました";
   toast("短縮URLをコピーしました");
   window.setTimeout(() => {
     button.textContent = original;

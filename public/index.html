@@ -15,13 +15,10 @@
 
   <header class="site-header">
     <div class="wrap site-header-inner">
-      <a class="wordmark" href="/">
-        <span class="wordmark-mark" aria-hidden="true">PK</span>
-        <span class="wordmark-text">Short</span>
-      </a>
+      <a class="wordmark" href="/">PK Short</a>
       <div class="site-header-meta">
         <span class="host" data-host title="現在のホスト"></span>
-        <span class="admin-badge" id="admin-badge" hidden>管理者</span>
+        <span class="admin-badge" id="admin-badge" hidden>管理者としてログイン中</span>
         <button type="button" class="button-text" id="admin-button" hidden>管理</button>
         <button type="button" class="button-text" id="logout-button" hidden>ログアウト</button>
       </div>
@@ -36,7 +33,7 @@
 
     <section id="view-login" class="view view-narrow" aria-labelledby="login-title" hidden>
       <h1 id="login-title">管理者ログイン</h1>
-      <p class="lede">管理者は、すべての短縮URLの一覧表示・削除と、1〜3文字の短い短縮キーの作成ができます。</p>
+      <p class="lede">管理者用のページです。</p>
 
       <div id="login-unconfigured" hidden>
         <p class="notice">管理トークン（<code>ADMIN_TOKEN</code>）が設定されていないため、管理者ログインは無効です。短縮URLの作成は通常どおり利用できます。</p>
@@ -70,8 +67,7 @@
 
     <div id="view-app" class="view" hidden>
       <section class="composer" aria-labelledby="composer-title">
-        <h1 id="composer-title">URLを短縮する</h1>
-        <p class="lede">登録不要・無料。長いURLを貼り付けて「短縮する」を押すだけで、すぐに使える短縮URLができます。</p>
+        <h1 id="composer-title">URLを短縮</h1>
 
         <p class="notice" id="public-disabled" hidden>現在、ログインなしでの短縮URLの作成は一時停止しています。</p>
 
@@ -86,7 +82,7 @@
           </div>
 
           <div class="field">
-            <label for="slug-input">カスタムURL <span class="optional">任意</span></label>
+            <label for="slug-input">カスタムURL <span class="optional">（任意）</span></label>
             <div class="affix">
               <span class="affix-prefix" data-prefix aria-hidden="true"></span>
               <input id="slug-input" name="slug" type="text" maxlength="40"
@@ -105,7 +101,7 @@
         </form>
 
         <div class="result" id="result" tabindex="-1" aria-labelledby="result-title" hidden>
-          <p class="result-title" id="result-title">短縮URLを作成しました</p>
+          <p class="result-title" id="result-title">作成しました</p>
           <div class="result-body">
             <a class="result-url" id="result-url" target="_blank" rel="noopener noreferrer"></a>
             <button type="button" class="button-secondary" id="result-copy">コピー</button>
@@ -119,15 +115,14 @@
 
       <section class="links" id="history-section" aria-labelledby="history-title">
         <div class="links-heading">
-          <h2 id="history-title">このデバイスで作成した短縮URL</h2>
+          <h2 id="history-title">履歴</h2>
           <p class="links-count" id="history-count" aria-live="polite"></p>
         </div>
         <ol class="link-list" id="history-list" aria-labelledby="history-title"></ol>
         <div class="empty" id="history-empty" hidden>
-          <p class="empty-title">履歴はまだありません</p>
-          <p class="muted">短縮URLを作成すると、ここに表示されます。</p>
+          <p class="empty-title">まだありません。</p>
         </div>
-        <p class="links-note">履歴はこのブラウザの中にだけ保存されます。履歴から消しても短縮URLは使えるままです。</p>
+        <p class="links-note">履歴はこのブラウザにだけ保存されます。履歴から消しても短縮URLは使えます。</p>
       </section>
 
       <section class="links" id="admin-section" aria-labelledby="links-title" hidden>
@@ -144,8 +139,7 @@
         <ol class="link-list" id="link-list" aria-labelledby="links-title"></ol>
 
         <div class="empty" id="links-empty" hidden>
-          <p class="empty-title">まだ短縮URLはありません</p>
-          <p class="muted">上のフォームに長いURLを入力して、最初の短縮URLを作成しましょう。</p>
+          <p class="empty-title">まだありません。</p>
         </div>
 
         <div class="load-more">
@@ -157,9 +151,8 @@
 
   <footer class="site-footer">
     <div class="wrap site-footer-inner">
-      <p>PK Short — 登録不要・無料の短縮URLサービス。短縮URLに有効期限はなく、転送時に広告は表示しません。</p>
-      <p>違法・有害なサイトや、他の短縮URLサービスへのリンクは登録できません。不適切なリンクは予告なく削除します。</p>
-      <p><a href="https://github.com/ppkk12/pk-short" rel="noopener noreferrer">ソースコード（GitHub）</a></p>
+      <p>違法・有害なサイトや、他の短縮URLサービスのURLは登録できません。不適切なリンクは削除することがあります。</p>
+      <p><a href="https://github.com/ppkk12/pk-short" rel="noopener noreferrer">GitHub</a></p>
     </div>
   </footer>
 
