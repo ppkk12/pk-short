@@ -2,7 +2,8 @@
   "name": "pk-short",
   "version": "1.0.0",
   "private": true,
-  "description": "PK Short — Cloudflare Workers + D1 で動く個人用の短縮URLサービス",
+  "description": "PK Short — Cloudflare Workers + D1 で動く登録不要の短縮URLサービス",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
